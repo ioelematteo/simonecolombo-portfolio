@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="description" content="Simone Colombo — Product Designer" />
+<title>Simone Colombo</title>
+
+<!-- Bootstrap 5 (structure only, heavily overridden) -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- Fonts: Editorial New (italic) + Neue Haas for Swiss feel -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS & RESET
+═══════════════════════════════════════════════════ */
+:root {
+  --black:   #080808;
+  --white:   #f0ece4;           /* Warm white, not pure */
+  --dim:     rgba(240,236,228,.35);
+  --dimmer:  rgba(240,236,228,.15);
+  --serif:   'DM Serif Display', Georgia, serif;
+  --sans:    'DM Sans', system-ui, sans-serif;
+  --ease:    cubic-bezier(.16,1,.3,1);
+  --slow:    cubic-bezier(.25,.8,.25,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--sans);
+  font-weight: 300;
+  overflow-x: hidden;
+  cursor: none;           /* We'll build a custom cursor */
+  -webkit-font-smoothing: antialiased;
+}
+
+a  { color: inherit; text-decoration: none; }
+ul { list-style: none; padding: 0; margin: 0; }
+img { display: block; width: 100%; }
+::selection { background: var(--white); color: var(--black); }
+
+/* Hide scrollbar but keep functionality */
+::-webkit-scrollbar { width: 0; }
+
+/* ═══════════════════════════════════════════════════
+   CUSTOM CURSOR (desktop only)
+═══════════════════════════════════════════════════ */
+.cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 10px; height: 10px;
+  background: var(--white);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform .1s var(--ease), width .4s var(--ease), height .4s var(--ease), opacity .3s;
+  mix-blend-mode: difference;
+}
+.cursor.grow {
+  width: 56px;
+  height: 56px;
+}
+/* Hide custom cursor on touch devices */
+@media (hover: none) { .cursor { display: none; } body { cursor: auto; } }
+
+/* ═══════════════════════════════════════════════════
+   NOISE TEXTURE OVERLAY
+═══════════════════════════════════════════════════ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9000;
+  opacity: .6;
+}
+
+/* ═══════════════════════════════════════════════════
+   NAV
+═══════════════════════════════════════════════════ */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 800;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 32px;
+  mix-blend-mode: difference;   /* Inverts over white sections */
+  transition: padding .5s var(--ease);
+}
+nav.compact { padding: 18px 32px; }
+
+.nav-logo {
+  font-family: var(--serif);
+  font-size: .95rem;
+  letter-spacing: .04em;
+  color: var(--white);
+}
+.nav-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: .7rem;
+  font-weight: 400;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+.dot-live {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px #4ade80;
+  animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+
+.nav-cta {
+  font-size: .7rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--white);
+  border-bottom: 1px solid var(--dimmer);
+  padding-bottom: 2px;
+  transition: border-color .3s;
+}
+.nav-cta:hover { border-color: var(--white); }
+/* Hide cta on small screens */
+@media (max-width: 640px) { .nav-cta { display: none; } }
+
+/* ═══════════════════════════════════════════════════
+   MARQUEE BAR (appears after hero on scroll)
+═══════════════════════════════════════════════════ */
+.marquee-bar {
+  width: 100%;
+  overflow: hidden;
+  border-top: 1px solid var(--dimmer);
+  border-bottom: 1px solid var(--dimmer);
+  padding: 14px 0;
+  white-space: nowrap;
+}
+.marquee-track {
+  display: inline-flex;
+  animation: marquee 22s linear infinite;
+}
+.marquee-track span {
+  font-size: .72rem;
+  font-weight: 400;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--dim);
+  padding: 0 48px;
+}
+.marquee-track span em {
+  font-style: normal;
+  color: var(--white);
+}
+@keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+/* ═══════════════════════════════════════════════════
+   SHARED SECTION HELPERS
+═══════════════════════════════════════════════════ */
+section {
+  padding: 120px 32px;
+  position: relative;
+}
+@media (min-width: 768px)  { section { padding: 160px 56px; } }
+@media (min-width: 1200px) { section { padding: 200px 100px; } }
+
+/* Eyebrow label */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-size: .65rem;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  color: var(--dim);
+  margin-bottom: 56px;
+}
+.label::before {
+  content: '';
+  width: 32px;
+  height: 1px;
+  background: var(--dim);
+}
+
+/* ═══════════════════════════════════════════════════
+   REVEAL ANIMATION SYSTEM
+   Elements start invisible; JS observer adds .in
+═══════════════════════════════════════════════════ */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity .9s var(--ease), transform .9s var(--ease);
+}
+[data-reveal="left"]  { transform: translateX(-40px); }
+[data-reveal="right"] { transform: translateX(40px); }
+[data-reveal="scale"] { transform: scale(.96); }
+[data-reveal].in {
+  opacity: 1;
+  transform: none;
+}
+/* Stagger delay via inline style or modifiers */
+[data-delay="1"] { transition-delay: .1s; }
+[data-delay="2"] { transition-delay: .2s; }
+[data-delay="3"] { transition-delay: .3s; }
+[data-delay="4"] { transition-delay: .4s; }
+[data-delay="5"] { transition-delay: .5s; }
+
+/* ═══════════════════════════════════════════════════
+   ① HERO
+═══════════════════════════════════════════════════ */
+#hero {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 72px;
+  position: relative;
+  overflow: hidden;
+  background-image: url(bg.png);
+  background-repeat: no-repeat;
+  background-position-x: right;
+  background-position-y: center;
+}
+
+@media (max-width: 768px) {
+  #hero {
+    background-position-x: 60%;
+    background-size: 300%;
+  }
+}
+
+/* Large ambient circle */
+#hero::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -30%;
+  width: 80vw;
+  height: 80vw;
+  max-width: 900px;
+  max-height: 900px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+@media (max-width: 480px) {
+  #hero {
+    min-height: 60vh;
+  }
+}
+
+/* Massive name */
+.hero-name {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(3.5rem, 14vw, 13rem);
+  line-height: .92;
+  letter-spacing: -.03em;
+  color: var(--white);
+}
+/* Italic variant for second word */
+.hero-name em {
+  font-style: italic;
+  color: var(--dim);
+}
+
+.hero-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.hero-statement {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: 200;
+  color: var(--dim);
+  max-width: 400px;
+  line-height: 1.4;
+}
+.hero-statement strong {
+  color: var(--white);
+  font-weight: 400;
+}
+
+.hero-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: .72rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  text-align: right;
+}
+
+/* Scroll nudge */
+.hero-scroll {
+  position: absolute;
+  bottom: 72px;
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-size: .65rem;
+  letter-spacing: .25em;
+  text-transform: uppercase;
+  color: var(--dimmer);
+  writing-mode: vertical-rl;
+}
+.hero-scroll .tick {
+  width: 1px;
+  height: 48px;
+  background: linear-gradient(var(--dimmer), transparent);
+  animation: tickGrow 2s ease-in-out infinite;
+}
+@keyframes tickGrow {
+  0%   { transform: scaleY(0); transform-origin: top; opacity: 1; }
+  50%  { transform: scaleY(1); transform-origin: top; opacity: 1; }
+  51%  { transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; opacity: 0; }
+}
+@media (max-width: 640px) { .hero-scroll { display: none; } }
+
+/* ═══════════════════════════════════════════════════
+   ② ABOUT
+═══════════════════════════════════════════════════ */
+#about {
+  border-top: 1px solid var(--dimmer);
+}
+
+.about-headline {
+  font-family: var(--serif);
+  font-size: clamp(2rem, 6vw, 5rem);
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -.025em;
+  max-width: 900px;
+}
+.about-headline em {
+  font-style: italic;
+  color: var(--dim);
+}
+
+.about-aside {
+  margin-top: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 56px;
+  justify-content: flex-end;
+}
+
+.about-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: right;
+}
+.about-stat .num {
+  font-family: var(--serif);
+  font-size: 3.5rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+.about-stat .unit {
+  font-size: .68rem;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* ═══════════════════════════════════════════════════
+   ③ EXPERIENCE
+═══════════════════════════════════════════════════ */
+#experience {
+  border-top: 1px solid var(--dimmer);
+}
+
+.exp-list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each row */
+.exp-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 32px;
+  padding: 36px 0;
+  border-bottom: 1px solid var(--dimmer);
+  position: relative;
+  overflow: hidden;
+  transition: padding .45s var(--ease);
+}
+.exp-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--white);
+  transform: scaleY(0);
+  transform-origin: bottom;
+  transition: transform .5s var(--ease);
+  z-index: 0;
+}
+.exp-row:hover::before   { transform: scaleY(1); }
+.exp-row:hover .exp-role { color: var(--black); }
+.exp-row:hover .exp-co   { color: rgba(8,8,8,.45); }
+.exp-row:hover .exp-year { color: rgba(8,8,8,.45); }
+.exp-row:hover .exp-num  { color: rgba(8,8,8,.2); }
+.exp-row > * { position: relative; z-index: 1; }
+
+.exp-num {
+  font-family: var(--serif);
+  font-size: .8rem;
+  color: var(--dimmer);
+  min-width: 28px;
+  transition: color .5s var(--ease);
+}
+.exp-role {
+  font-family: var(--serif);
+  font-size: clamp(1.5rem, 3.5vw, 2.6rem);
+  font-weight: 400;
+  letter-spacing: -.02em;
+  color: var(--white);
+  flex: 1;
+  transition: color .5s var(--ease);
+}
+.exp-co {
+  font-size: .8rem;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color .5s var(--ease);
+}
+.exp-year {
+  font-size: .8rem;
+  letter-spacing: .15em;
+  color: var(--dim);
+  transition: color .5s var(--ease);
+}
+
+/* ═══════════════════════════════════════════════════
+   ④ SKILLS
+═══════════════════════════════════════════════════ */
+#skills {
+  border-top: 1px solid var(--dimmer);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.skills-display {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.skill-pill {
+  display: inline-block;
+  padding: 10px 22px;
+  border: 1px solid var(--dimmer);
+  border-radius: 999px;
+  font-size: .8rem;
+  font-weight: 300;
+  letter-spacing: .08em;
+  color: var(--dim);
+  transition: all .4s var(--ease);
+  cursor: default;
+}
+.skill-pill:hover {
+  background: var(--white);
+  border-color: var(--white);
+  color: var(--black);
+  transform: translateY(-3px);
+}
+.skill-pill.big {
+  font-family: var(--serif);
+  font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  padding: 14px 32px;
+  border-radius: 999px;
+}
+
+/* ═══════════════════════════════════════════════════
+   ⑤ CONTACT / CTA
+═══════════════════════════════════════════════════ */
+#contact {
+  border-top: 1px solid var(--dimmer);
+  min-height: 80svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.contact-heading {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 10vw, 9rem);
+  font-weight: 400;
+  line-height: .92;
+  letter-spacing: -.04em;
+}
+.contact-heading em {
+  font-style: italic;
+  color: var(--dim);
+}
+
+.contact-row {
+  margin-top: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 48px;
+}
+
+.contact-email {
+  font-family: var(--serif);
+  font-size: clamp(1.2rem, 3vw, 2rem);
+  font-weight: 400;
+  letter-spacing: -.01em;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--dimmer);
+  padding-bottom: 4px;
+  transition: all .4s var(--ease);
+}
+.contact-email:hover {
+  gap: 28px;
+  border-color: var(--white);
+  opacity: 1;
+}
+.contact-email .arrow {
+  transition: transform .4s var(--ease);
+}
+.contact-email:hover .arrow { transform: translateX(8px) translateY(-8px); }
+
+.contact-links {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+.contact-links a {
+  font-size: .72rem;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--dim);
+  transition: color .3s;
+}
+.contact-links a:hover { color: var(--white); }
+
+/* ═══════════════════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════════════════ */
+footer {
+  border-top: 1px solid var(--dimmer);
+  padding: 28px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-size: .65rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--dimmer);
+}
+@media (min-width: 768px) { footer { padding: 28px 56px; } }
+
+/* ═══════════════════════════════════════════════════
+   LINE DRAW DIVIDER (decorative)
+═══════════════════════════════════════════════════ */
+.line-draw {
+  width: 0;
+  height: 1px;
+  background: var(--dim);
+  transition: width 1.2s var(--ease);
+}
+.line-draw.in { width: 100%; }
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE TWEAKS
+═══════════════════════════════════════════════════ */
+@media (max-width: 640px) {
+  .about-aside { justify-content: flex-start; }
+  .about-stat  { text-align: left; }
+  .contact-row { flex-direction: column; align-items: flex-start; }
+  .contact-links { align-items: flex-start; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    transition-duration: .01ms !important;
+  }
+  html { scroll-behavior: auto; }
+}
+
+.services-grid {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 48px;
+}
+
+@media (min-width: 768px) {
+  .services-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 64px 56px;
+  }
+}
+
+.service-item {
+  position: relative;
+  padding-top: 12px;
+}
+
+.service-index {
+  font-size: .7rem;
+  letter-spacing: .2em;
+  color: var(--dimmer);
+  display: block;
+  margin-bottom: 12px;
+}
+
+.service-item h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: -.01em;
+}
+
+.service-item p {
+  font-size: .95rem;
+  line-height: 1.6;
+  color: var(--dim);
+  max-width: 420px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- ─────────────────────────────────────────
+     CUSTOM CURSOR
+───────────────────────────────────────── -->
+<div class="cursor" id="cursor"></div>
+
+<!-- ─────────────────────────────────────────
+     NAV
+───────────────────────────────────────── -->
+<nav id="nav">
+  <span class="nav-logo">SC</span>
+  <div class="nav-status">
+    <span class="dot-live"></span>
+    Disponibile 2026
+  </div>
+  <a href="#contact" class="nav-cta">Contattami →</a>
+</nav>
+
+
+<!-- ─────────────────────────────────────────
+     ① HERO
+───────────────────────────────────────── -->
+<section id="hero" aria-label="Introduction">
+  <div class="hero-inner">
+
+    <!-- Giant name — split so second part is italic/dim -->
+    <h1 class="hero-name" data-reveal>
+      Simone<br />
+      <em>Colombo</em>
+    </h1>
+
+    <div class="hero-bottom">
+      <!-- Left: short statement -->
+      <p class="hero-statement" data-reveal data-delay="2">
+        <strong>Digital marketer.</strong><br />
+        Social media e ads a portata di mano
+      </p>
+
+      <!-- Right: two quick facts -->
+      <div class="hero-meta" data-reveal data-delay="3">
+        <span>Lecco, Italia</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Vertical scroll hint -->
+  <div class="hero-scroll" aria-hidden="true">
+    <span class="tick"></span>
+    Scroll
+  </div>
+</section>
+
+
+<!-- ─────────────────────────────────────────
+     MARQUEE between hero and about
+───────────────────────────────────────── -->
+<div class="marquee-bar" aria-hidden="true">
+  <div class="marquee-track">
+    <!-- Duplicate content for seamless loop -->
+    <span>Digital Marketing <em>·</em></span>
+    <span>Social media managment <em>·</em></span>
+    <span>Meta Ads<em>·</em></span>
+    <span>Google Ads<em>·</em></span>
+    <span>Performance Marketing <em>·</em></span>
+    <span>Consulenza <em>·</em></span>    
+    <span>Digital Marketing <em>·</em></span>
+    <span>Social media managment <em>·</em></span>
+    <span>Meta Ads<em>·</em></span>
+    <span>Google Ads<em>·</em></span>
+    <span>Performance Marketing <em>·</em></span>
+    <span>Consulenza <em>·</em></span>
+  </div>
+</div>
+
+
+<!-- ─────────────────────────────────────────
+     ② ABOUT
+───────────────────────────────────────── -->
+<section id="about" aria-label="About">
+
+  <span class="label" data-reveal>About</span>
+
+  <h2 class="about-headline" data-reveal data-delay="1">
+    Il digitale non è più una scelta,
+    è la tua carta d'identità.<br />
+    <em>Affidati a me.</em>
+  </h2>
+
+  <!-- Stats row -->
+  <div class="about-aside">
+    <div class="about-stat" data-reveal data-delay="1">
+      <span class="num">6+</span>
+      <span class="unit">Anni di esperienza</span>
+    </div>
+    <div class="about-stat" data-reveal data-delay="2">
+      <span class="num">30+</span>
+      <span class="unit">Aziende soddisfatte</span>
+    </div>
+    <div class="about-stat" data-reveal data-delay="3">
+      <span class="num">3</span>
+      <span class="unit">Paesi d'europa</span>
+    </div>
+  </div>
+
+</section>
+
+
+<!-- ─────────────────────────────────────────
+     ③ EXPERIENCE
+───────────────────────────────────────── -->
+<section id="experience" aria-label="Experience">
+
+  <span class="label" data-reveal>Esperienze</span>
+
+  <ul class="exp-list" data-reveal data-delay="1">
+
+    <!-- Each item: index · role · company · year -->
+    <li class="exp-row">
+      <span class="exp-num">01</span>
+      <span class="exp-role">Digital marketer</span>
+      <span class="exp-co">Freelance</span>
+      <span class="exp-year">2024 — Now</span>
+    </li>
+
+    <li class="exp-row">
+      <span class="exp-num">02</span>
+      <span class="exp-role">Ecommerce manager</span>
+      <span class="exp-co">Joule</span>
+      <span class="exp-year">2021 — 24</span>
+    </li>
+
+    <li class="exp-row">
+      <span class="exp-num">03</span>
+      <span class="exp-role">Social media manager</span>
+      <span class="exp-co">G.S. Sala al Barro</span>
+      <span class="exp-year">2019 — 21</span>
+    </li>
+
+    <li class="exp-row">
+      <span class="exp-num">04</span>
+      <span class="exp-role">Contabile</span>
+      <span class="exp-co">Gruppo gattinoni</span>
+      <span class="exp-year">2015 — 19</span>
+    </li>
+
+  </ul>
+
+</section>
+
+
+<!-- ─────────────────────────────────────────
+     ④ SKILLS
+     Mix of big serif pills and small sans pills
+───────────────────────────────────────── -->
+<section id="skills" aria-label="Skills">
+
+  <h1 class="about-headline in mb-5">Di cosa mi occupo</h1>
+
+  <!-- Intro più autorevole -->
+  <div style="max-width: 720px;" data-reveal data-delay="1">
+    <p style="font-size: clamp(1.2rem, 2.5vw, 1.6rem); line-height: 1.5; color: var(--dim); text-align: center;">
+      Aiuto aziende e professionisti a <strong style="color: var(--white);">crescere online in modo misurabile</strong>,
+      costruendo strategie digitali orientate alla performance, non alla presenza.
+    </p>
+  </div>
+
+  <!-- GRID SERVIZI -->
+  <div class="services-grid" data-reveal data-delay="2">
+
+    <!-- 01 -->
+    <div class="service-item">
+      <span class="service-index">01</span>
+      <h3>Social Media Management</h3>
+      <p>
+        Gestione strategica dei social media con focus su contenuti, posizionamento e crescita organica.
+        Non solo pubblicazione, ma costruzione di un'identità digitale coerente.
+      </p>
+    </div>
+
+    <!-- 02 -->
+    <div class="service-item">
+      <span class="service-index">02</span>
+      <h3>Meta Ads (Facebook & Instagram)</h3>
+      <p>
+        Creazione e ottimizzazione campagne pubblicitarie orientate alla conversione:
+        lead generation, vendite e acquisizione clienti con controllo costante delle performance.
+      </p>
+    </div>
+
+    <!-- 03 -->
+    <div class="service-item">
+      <span class="service-index">03</span>
+      <h3>Google Ads</h3>
+      <p>
+        Intercetto domanda consapevole attraverso campagne su rete di ricerca e display,
+        migliorando visibilità e ritorno sull’investimento.
+      </p>
+    </div>
+
+    <!-- 04 -->
+    <div class="service-item">
+      <span class="service-index">04</span>
+      <h3>Strategie per Local Business</h3>
+      <p>
+        Aiuto attività locali a posizionarsi su Google e ad aumentare clienti nella propria zona,
+        combinando SEO locale, ads e presenza digitale.
+      </p>
+    </div>
+
+    <!-- 05 -->
+    <div class="service-item">
+      <span class="service-index">05</span>
+      <h3>Strategia Digitale</h3>
+      <p>
+        Analisi, definizione e sviluppo di strategie su misura per far crescere il business online
+        in modo strutturato e scalabile.
+      </p>
+    </div>
+
+    <!-- 06 -->
+    <div class="service-item">
+      <span class="service-index">06</span>
+      <h3>Consulenza Web Marketing</h3>
+      <p>
+        Supporto strategico per ottimizzare processi, campagne e presenza digitale,
+        con un approccio pratico e orientato ai risultati.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- MICRO SKILLS (più pulite e meno ridondanti) -->
+  <div class="skills-display" style="margin-top: 56px;" data-reveal data-delay="3">
+    <span class="skill-pill">Ottimizzazione campagne</span>
+    <span class="skill-pill">Gestione budget</span>
+    <span class="skill-pill">Performance tracking</span>
+    <span class="skill-pill">SEO locale</span>
+    <span class="skill-pill">Acquisizione clienti</span>
+    <span class="skill-pill">Strategie su misura</span>
+  </div>
+
+</section>
+
+
+<!-- ─────────────────────────────────────────
+     ⑤ CONTACT
+───────────────────────────────────────── -->
+<section id="contact" aria-label="Contact">
+
+  <span class="label" data-reveal>Lavoriamo insieme</span>
+
+  <!-- Big heading -->
+  <h2 class="contact-heading" data-reveal data-delay="1">
+    Hai un'idea?<br />
+    <em></em>
+  </h2>
+
+  <div class="contact-row">
+
+    <!-- Email CTA -->
+    <a href="mailto:simone.colombo9@gmail.com" class="contact-email" data-reveal data-delay="2">
+      simone.colombo9@gmail.com
+      <span class="arrow">↗</span>
+    </a>
+
+    <!-- Social links stacked -->
+    <div class="contact-links" data-reveal data-delay="3">
+      <a href="#" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="#" target="_blank" rel="noopener">Dribbble</a>
+      <a href="#" target="_blank" rel="noopener">GitHub</a>
+      <a href="#" target="_blank" rel="noopener">Read.cv</a>
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ─────────────────────────────────────────
+     FOOTER
+───────────────────────────────────────── -->
+<footer>
+  <span>© 2026 Simone Colombo</span>
+  <span>Milan, Italy</span>
+  <span>Designed with intention.</span>
+</footer>
+
+
+<!-- Bootstrap JS (minimal, for collapse utilities if needed) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   1. CUSTOM CURSOR
+   Tracks mouse position; grows on interactive elements
+═══════════════════════════════════════════════════ */
+(function() {
+  const cursor = document.getElementById('cursor');
+  if (!cursor) return;
+
+  let mouseX = 0, mouseY = 0;
+  let curX = 0, curY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+
+  // Smooth cursor follow via requestAnimationFrame
+  function raf() {
+    curX += (mouseX - curX) * 0.15;
+    curY += (mouseY - curY) * 0.15;
+    cursor.style.left = curX + 'px';
+    cursor.style.top  = curY + 'px';
+    requestAnimationFrame(raf);
+  }
+  raf();
+
+  // Grow on hover for links, buttons, interactive elements
+  document.querySelectorAll('a, button, .exp-row, .skill-pill').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('grow'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('grow'));
+  });
+})();
+
+/* ═══════════════════════════════════════════════════
+   2. NAVBAR COMPACT ON SCROLL
+═══════════════════════════════════════════════════ */
+(function() {
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('compact', window.scrollY > 60);
+  }, { passive: true });
+})();
+
+/* ═══════════════════════════════════════════════════
+   3. REVEAL ON SCROLL
+   IntersectionObserver adds .in class to trigger CSS
+═══════════════════════════════════════════════════ */
+(function() {
+  const targets = document.querySelectorAll('[data-reveal], .line-draw');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in');
+        observer.unobserve(entry.target); // animate once
+      }
+    });
+  }, {
+    threshold: 0.1,
+    rootMargin: '0px 0px -80px 0px'
+  });
+
+  targets.forEach(el => observer.observe(el));
+})();
+
+/* ═══════════════════════════════════════════════════
+   4. SMOOTH SCROLL with nav offset
+   Handles all internal anchor links
+═══════════════════════════════════════════════════ */
+(function() {
+  const nav = document.getElementById('nav');
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const id = link.getAttribute('href');
+      if (id.length < 2) return;
+      const target = document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      const offset = target.getBoundingClientRect().top + window.scrollY - nav.offsetHeight;
+      window.scrollTo({ top: offset, behavior: 'smooth' });
+    });
+  });
+})();
+
+/* ═══════════════════════════════════════════════════
+   5. HERO TEXT PARALLAX (subtle)
+   Moves hero name slightly as user scrolls
+═══════════════════════════════════════════════════ */
+(function() {
+  const heroName = document.querySelector('.hero-name');
+  if (!heroName) return;
+
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    // Subtle shift — 0.18 factor keeps it gentle
+    heroName.style.transform = `translateY(${y * 0.18}px)`;
+  }, { passive: true });
+})();
+
+/* ═══════════════════════════════════════════════════
+   6. MARQUEE PAUSE ON HOVER
+═══════════════════════════════════════════════════ */
+(function() {
+  const track = document.querySelector('.marquee-track');
+  if (!track) return;
+  const bar = track.closest('.marquee-bar');
+  bar.addEventListener('mouseenter', () => track.style.animationPlayState = 'paused');
+  bar.addEventListener('mouseleave', () => track.style.animationPlayState = 'running');
+})();
+</script>
+</body>
+</html>
