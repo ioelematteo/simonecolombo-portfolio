@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="description" content="Simone Colombo — Product Designer" />
+<meta name="description" content="Simone Colombo — Digital Marketer" />
 <title>Simone Colombo</title>
 
-<!-- Bootstrap 5 (structure only, heavily overridden) -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-
-<!-- Fonts: Editorial New (italic) + Neue Haas for Swiss feel -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,wght@0,200;0,300;0,400;0,500;1,200;1,300&display=swap" rel="stylesheet" />
@@ -20,13 +17,27 @@
 ═══════════════════════════════════════════════════ */
 :root {
   --black:   #080808;
-  --white:   #f0ece4;           /* Warm white, not pure */
+  --white:   #f0ece4;
   --dim:     rgba(240,236,228,.35);
   --dimmer:  rgba(240,236,228,.15);
   --serif:   'DM Serif Display', Georgia, serif;
   --sans:    'DM Sans', system-ui, sans-serif;
   --ease:    cubic-bezier(.16,1,.3,1);
   --slow:    cubic-bezier(.25,.8,.25,1);
+
+  /* Bottom nav */
+  --nav-bg:  rgba(15,15,15,.72);
+  --nav-border: rgba(240,236,228,.1);
+}
+
+/* ── LIGHT MODE overrides ── */
+body.light {
+  --black:   #f4f0e8;
+  --white:   #0f0f0f;
+  --dim:     rgba(15,15,15,.45);
+  --dimmer:  rgba(15,15,15,.18);
+  --nav-bg:  rgba(244,240,232,.78);
+  --nav-border: rgba(15,15,15,.12);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -38,20 +49,21 @@ body {
   font-family: var(--sans);
   font-weight: 300;
   overflow-x: hidden;
-  cursor: none;           /* We'll build a custom cursor */
+  cursor: none;
   -webkit-font-smoothing: antialiased;
+  transition: background .4s var(--ease), color .4s var(--ease);
+  /* extra space for bottom nav */
+  padding-bottom: 80px;
 }
 
 a  { color: inherit; text-decoration: none; }
 ul { list-style: none; padding: 0; margin: 0; }
 img { display: block; width: 100%; }
 ::selection { background: var(--white); color: var(--black); }
-
-/* Hide scrollbar but keep functionality */
 ::-webkit-scrollbar { width: 0; }
 
 /* ═══════════════════════════════════════════════════
-   CUSTOM CURSOR (desktop only)
+   CUSTOM CURSOR
 ═══════════════════════════════════════════════════ */
 .cursor {
   position: fixed;
@@ -65,15 +77,11 @@ img { display: block; width: 100%; }
   transition: transform .1s var(--ease), width .4s var(--ease), height .4s var(--ease), opacity .3s;
   mix-blend-mode: difference;
 }
-.cursor.grow {
-  width: 56px;
-  height: 56px;
-}
-/* Hide custom cursor on touch devices */
+.cursor.grow { width: 56px; height: 56px; }
 @media (hover: none) { .cursor { display: none; } body { cursor: auto; } }
 
 /* ═══════════════════════════════════════════════════
-   NOISE TEXTURE OVERLAY
+   NOISE TEXTURE
 ═══════════════════════════════════════════════════ */
 body::before {
   content: '';
@@ -86,9 +94,9 @@ body::before {
 }
 
 /* ═══════════════════════════════════════════════════
-   NAV
+   TOP NAV
 ═══════════════════════════════════════════════════ */
-nav {
+nav#top-nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 800;
@@ -96,10 +104,10 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 28px 32px;
-  mix-blend-mode: difference;   /* Inverts over white sections */
+  mix-blend-mode: difference;
   transition: padding .5s var(--ease);
 }
-nav.compact { padding: 18px 32px; }
+nav#top-nav.compact { padding: 18px 32px; }
 
 .nav-logo {
   font-family: var(--serif);
@@ -136,11 +144,124 @@ nav.compact { padding: 18px 32px; }
   transition: border-color .3s;
 }
 .nav-cta:hover { border-color: var(--white); }
-/* Hide cta on small screens */
 @media (max-width: 640px) { .nav-cta { display: none; } }
 
 /* ═══════════════════════════════════════════════════
-   MARQUEE BAR (appears after hero on scroll)
+   BOTTOM NAVBAR — modern blur pill
+═══════════════════════════════════════════════════ */
+#bottom-nav {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 8000;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid var(--nav-border);
+  border-radius: 999px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.35), 0 1px 0 rgba(255,255,255,.05) inset;
+  transition: background .4s var(--ease), border-color .4s var(--ease), opacity .4s var(--ease), transform .6s var(--ease);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-50%) translateY(12px);
+}
+#bottom-nav.visible {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateX(-50%) translateY(0);
+}
+
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: .58rem;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--dim);
+  cursor: pointer;
+  transition: all .3s var(--ease);
+  text-decoration: none;
+  position: relative;
+  border: none;
+  background: transparent;
+}
+.bnav-item svg {
+  width: 18px; height: 18px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke .3s;
+}
+.bnav-item:hover,
+.bnav-item.active {
+  color: var(--white);
+  background: rgba(240,236,228,.08);
+}
+body.light .bnav-item:hover,
+body.light .bnav-item.active {
+  background: rgba(15,15,15,.08);
+}
+.bnav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+/* Separator */
+.bnav-sep {
+  width: 1px;
+  height: 28px;
+  background: var(--nav-border);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* Theme toggle button in bottom nav */
+.bnav-theme {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 1px solid var(--nav-border);
+  background: transparent;
+  color: var(--dim);
+  transition: all .3s var(--ease);
+  flex-shrink: 0;
+}
+.bnav-theme:hover { color: var(--white); background: rgba(240,236,228,.08); }
+body.light .bnav-theme:hover { background: rgba(15,15,15,.08); }
+.bnav-theme svg { width: 16px; height: 16px; }
+/* show moon in dark, sun in light */
+.bnav-theme .icon-moon { display: block; }
+.bnav-theme .icon-sun  { display: none; }
+body.light .bnav-theme .icon-moon { display: none; }
+body.light .bnav-theme .icon-sun  { display: block; }
+
+@media (max-width: 480px) {
+  .bnav-item { padding: 8px 12px; font-size: .52rem; letter-spacing: .1em; }
+  .bnav-item svg { width: 16px; height: 16px; }
+}
+
+/* ═══════════════════════════════════════════════════
+   MARQUEE BAR
 ═══════════════════════════════════════════════════ */
 .marquee-bar {
   width: 100%;
@@ -162,10 +283,7 @@ nav.compact { padding: 18px 32px; }
   color: var(--dim);
   padding: 0 48px;
 }
-.marquee-track span em {
-  font-style: normal;
-  color: var(--white);
-}
+.marquee-track span em { font-style: normal; color: var(--white); }
 @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
 /* ═══════════════════════════════════════════════════
@@ -178,7 +296,6 @@ section {
 @media (min-width: 768px)  { section { padding: 160px 56px; } }
 @media (min-width: 1200px) { section { padding: 200px 100px; } }
 
-/* Eyebrow label */
 .label {
   display: inline-flex;
   align-items: center;
@@ -197,8 +314,7 @@ section {
 }
 
 /* ═══════════════════════════════════════════════════
-   REVEAL ANIMATION SYSTEM
-   Elements start invisible; JS observer adds .in
+   REVEAL SYSTEM
 ═══════════════════════════════════════════════════ */
 [data-reveal] {
   opacity: 0;
@@ -208,11 +324,7 @@ section {
 [data-reveal="left"]  { transform: translateX(-40px); }
 [data-reveal="right"] { transform: translateX(40px); }
 [data-reveal="scale"] { transform: scale(.96); }
-[data-reveal].in {
-  opacity: 1;
-  transform: none;
-}
-/* Stagger delay via inline style or modifiers */
+[data-reveal].in { opacity: 1; transform: none; }
 [data-delay="1"] { transition-delay: .1s; }
 [data-delay="2"] { transition-delay: .2s; }
 [data-delay="3"] { transition-delay: .3s; }
@@ -236,29 +348,19 @@ section {
   background-position-y: bottom;
   background-size: 100%;
 }
-
 @media (max-width: 768px) {
-  #hero {
-    background-position-x: 60%;
-    background-size: 300%;
-  }
+  #hero { background-position-x: 60%; background-size: 300%; }
 }
-
-/* Large ambient circle */
 #hero::after {
   content: '';
   position: absolute;
-  top: -20%;
-  right: -30%;
-  width: 80vw;
-  height: 80vw;
-  max-width: 900px;
-  max-height: 900px;
+  top: -20%; right: -30%;
+  width: 80vw; height: 80vw;
+  max-width: 900px; max-height: 900px;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(255,255,255,.04) 0%, transparent 65%);
   pointer-events: none;
 }
-
 .hero-inner {
   position: relative;
   z-index: 2;
@@ -266,14 +368,8 @@ section {
   flex-direction: column;
   gap: 40px;
 }
+@media (max-width: 480px) { #hero { min-height: 60vh; } }
 
-@media (max-width: 480px) {
-  #hero {
-    min-height: 60vh;
-  }
-}
-
-/* Massive name */
 .hero-name {
   font-family: var(--serif);
   font-weight: 400;
@@ -282,11 +378,7 @@ section {
   letter-spacing: -.03em;
   color: var(--white);
 }
-/* Italic variant for second word */
-.hero-name em {
-  font-style: italic;
-  color: var(--dim);
-}
+.hero-name em { font-style: italic; color: var(--dim); }
 
 .hero-bottom {
   display: flex;
@@ -295,7 +387,6 @@ section {
   justify-content: space-between;
   gap: 32px;
 }
-
 .hero-statement {
   font-size: clamp(1rem, 2.5vw, 1.5rem);
   font-weight: 200;
@@ -303,11 +394,7 @@ section {
   max-width: 400px;
   line-height: 1.4;
 }
-.hero-statement strong {
-  color: var(--white);
-  font-weight: 400;
-}
-
+.hero-statement strong { color: var(--white); font-weight: 400; }
 .hero-meta {
   display: flex;
   flex-direction: column;
@@ -319,12 +406,9 @@ section {
   color: var(--dim);
   text-align: right;
 }
-
-/* Scroll nudge */
 .hero-scroll {
   position: absolute;
-  bottom: 72px;
-  right: 32px;
+  bottom: 72px; right: 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -336,8 +420,7 @@ section {
   writing-mode: vertical-rl;
 }
 .hero-scroll .tick {
-  width: 1px;
-  height: 48px;
+  width: 1px; height: 48px;
   background: linear-gradient(var(--dimmer), transparent);
   animation: tickGrow 2s ease-in-out infinite;
 }
@@ -352,9 +435,7 @@ section {
 /* ═══════════════════════════════════════════════════
    ② ABOUT
 ═══════════════════════════════════════════════════ */
-#about {
-  border-top: 1px solid var(--dimmer);
-}
+#about { border-top: 1px solid var(--dimmer); }
 
 .about-headline {
   font-family: var(--serif);
@@ -364,11 +445,7 @@ section {
   letter-spacing: -.025em;
   max-width: 900px;
 }
-.about-headline em {
-  font-style: italic;
-  color: var(--dim);
-}
-
+.about-headline em { font-style: italic; color: var(--dim); }
 .about-aside {
   margin-top: 80px;
   display: flex;
@@ -376,13 +453,7 @@ section {
   gap: 56px;
   justify-content: flex-end;
 }
-
-.about-stat {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  text-align: right;
-}
+.about-stat { display: flex; flex-direction: column; gap: 8px; text-align: right; }
 .about-stat .num {
   font-family: var(--serif);
   font-size: 3.5rem;
@@ -400,16 +471,8 @@ section {
 /* ═══════════════════════════════════════════════════
    ③ EXPERIENCE
 ═══════════════════════════════════════════════════ */
-#experience {
-  border-top: 1px solid var(--dimmer);
-}
-
-.exp-list {
-  display: flex;
-  flex-direction: column;
-}
-
-/* Each row */
+#experience { border-top: 1px solid var(--dimmer); }
+.exp-list { display: flex; flex-direction: column; }
 .exp-row {
   display: flex;
   flex-wrap: wrap;
@@ -438,7 +501,6 @@ section {
 .exp-row:hover .exp-year { color: rgba(8,8,8,.45); }
 .exp-row:hover .exp-num  { color: rgba(8,8,8,.2); }
 .exp-row > * { position: relative; z-index: 1; }
-
 .exp-num {
   font-family: var(--serif);
   font-size: .8rem;
@@ -462,15 +524,10 @@ section {
   color: var(--dim);
   transition: color .5s var(--ease);
 }
-.exp-year {
-  font-size: .8rem;
-  letter-spacing: .15em;
-  color: var(--dim);
-  transition: color .5s var(--ease);
-}
+.exp-year { font-size: .8rem; letter-spacing: .15em; color: var(--dim); transition: color .5s var(--ease); }
 
 /* ═══════════════════════════════════════════════════
-   ④ SKILLS
+   ④ SKILLS / SERVICES
 ═══════════════════════════════════════════════════ */
 #skills {
   border-top: 1px solid var(--dimmer);
@@ -480,13 +537,77 @@ section {
   align-items: center;
 }
 
+.services-grid {
+  margin-top: 64px;
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 48px;
+}
+@media (min-width: 768px) {
+  .services-grid { grid-template-columns: repeat(2, 1fr); gap: 64px 56px; }
+}
+
+.service-item {
+  position: relative;
+  padding-top: 12px;
+  transition: transform .4s var(--ease);
+}
+.service-item:hover { transform: translateY(-4px); }
+
+/* Icon badge */
+.service-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px; height: 48px;
+  border: 1px solid var(--dimmer);
+  border-radius: 14px;
+  margin-bottom: 20px;
+  color: var(--dim);
+  transition: all .4s var(--ease);
+}
+.service-icon svg {
+  width: 22px; height: 22px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.service-item:hover .service-icon {
+  background: var(--white);
+  border-color: var(--white);
+  color: var(--black);
+  box-shadow: 0 4px 20px rgba(240,236,228,.12);
+}
+
+.service-index {
+  font-size: .7rem;
+  letter-spacing: .2em;
+  color: var(--dimmer);
+  display: block;
+  margin-bottom: 12px;
+}
+.service-item h3 {
+  font-family: var(--serif);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 400;
+  margin-bottom: 12px;
+  letter-spacing: -.01em;
+}
+.service-item p {
+  font-size: .95rem;
+  line-height: 1.6;
+  color: var(--dim);
+  max-width: 420px;
+}
+
 .skills-display {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 16px;
 }
-
 .skill-pill {
   display: inline-block;
   padding: 10px 22px;
@@ -513,7 +634,7 @@ section {
 }
 
 /* ═══════════════════════════════════════════════════
-   ⑤ CONTACT / CTA
+   ⑤ CONTACT
 ═══════════════════════════════════════════════════ */
 #contact {
   border-top: 1px solid var(--dimmer);
@@ -522,7 +643,6 @@ section {
   flex-direction: column;
   justify-content: center;
 }
-
 .contact-heading {
   font-family: var(--serif);
   font-size: clamp(3rem, 10vw, 9rem);
@@ -530,11 +650,7 @@ section {
   line-height: .92;
   letter-spacing: -.04em;
 }
-.contact-heading em {
-  font-style: italic;
-  color: var(--dim);
-}
-
+.contact-heading em { font-style: italic; color: var(--dim); }
 .contact-row {
   margin-top: 80px;
   display: flex;
@@ -543,7 +659,6 @@ section {
   justify-content: space-between;
   gap: 48px;
 }
-
 .contact-email {
   font-family: var(--serif);
   font-size: clamp(1.2rem, 3vw, 2rem);
@@ -557,22 +672,10 @@ section {
   padding-bottom: 4px;
   transition: all .4s var(--ease);
 }
-.contact-email:hover {
-  gap: 28px;
-  border-color: var(--white);
-  opacity: 1;
-}
-.contact-email .arrow {
-  transition: transform .4s var(--ease);
-}
+.contact-email:hover { gap: 28px; border-color: var(--white); }
+.contact-email .arrow { transition: transform .4s var(--ease); }
 .contact-email:hover .arrow { transform: translateX(8px) translateY(-8px); }
-
-.contact-links {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-}
+.contact-links { display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
 .contact-links a {
   font-size: .72rem;
   letter-spacing: .2em;
@@ -600,19 +703,15 @@ footer {
 }
 @media (min-width: 768px) { footer { padding: 28px 56px; } }
 
-/* ═══════════════════════════════════════════════════
-   LINE DRAW DIVIDER (decorative)
-═══════════════════════════════════════════════════ */
 .line-draw {
-  width: 0;
-  height: 1px;
+  width: 0; height: 1px;
   background: var(--dim);
   transition: width 1.2s var(--ease);
 }
 .line-draw.in { width: 100%; }
 
 /* ═══════════════════════════════════════════════════
-   RESPONSIVE TWEAKS
+   RESPONSIVE
 ═══════════════════════════════════════════════════ */
 @media (max-width: 640px) {
   .about-aside { justify-content: flex-start; }
@@ -620,71 +719,19 @@ footer {
   .contact-row { flex-direction: column; align-items: flex-start; }
   .contact-links { align-items: flex-start; }
 }
-
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: .01ms !important;
-    transition-duration: .01ms !important;
-  }
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   html { scroll-behavior: auto; }
 }
-
-.services-grid {
-  margin-top: 64px;
-  display: grid;
-  grid-template-columns: repeat(1, 1fr);
-  gap: 48px;
-}
-
-@media (min-width: 768px) {
-  .services-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 64px 56px;
-  }
-}
-
-.service-item {
-  position: relative;
-  padding-top: 12px;
-}
-
-.service-index {
-  font-size: .7rem;
-  letter-spacing: .2em;
-  color: var(--dimmer);
-  display: block;
-  margin-bottom: 12px;
-}
-
-.service-item h3 {
-  font-family: var(--serif);
-  font-size: clamp(1.4rem, 2.5vw, 2rem);
-  font-weight: 400;
-  margin-bottom: 12px;
-  letter-spacing: -.01em;
-}
-
-.service-item p {
-  font-size: .95rem;
-  line-height: 1.6;
-  color: var(--dim);
-  max-width: 420px;
-}
-
 </style>
 </head>
 <body>
 
-<!-- ─────────────────────────────────────────
-     CUSTOM CURSOR
-───────────────────────────────────────── -->
+<!-- CURSOR -->
 <div class="cursor" id="cursor"></div>
 
-<!-- ─────────────────────────────────────────
-     NAV
-───────────────────────────────────────── -->
-<nav id="nav">
+<!-- TOP NAV -->
+<nav id="top-nav">
   <span class="nav-logo">SC</span>
   <div class="nav-status">
     <span class="dot-live"></span>
@@ -693,35 +740,75 @@ footer {
   <a href="#contact" class="nav-cta">Contattami →</a>
 </nav>
 
+<!-- ═══ BOTTOM NAVBAR ═══ -->
+<nav id="bottom-nav" aria-label="Bottom navigation">
 
-<!-- ─────────────────────────────────────────
-     ① HERO
-───────────────────────────────────────── -->
+  <!-- Home -->
+  <a href="#hero" class="bnav-item active" data-section="hero">
+    <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+    <span>Home</span>
+  </a>
+
+  <!-- About -->
+  <a href="#about" class="bnav-item" data-section="about">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    <span>Chi sono</span>
+  </a>
+
+  <!-- Servizi -->
+  <a href="#skills" class="bnav-item" data-section="skills">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Servizi</span>
+  </a>
+
+  <!-- Contatti -->
+  <a href="#contact" class="bnav-item" data-section="contact">
+    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    <span>Contatti</span>
+  </a>
+
+  <div class="bnav-sep" aria-hidden="true"></div>
+
+  <!-- Theme toggle -->
+  <button class="bnav-theme" id="themeToggle" aria-label="Cambia tema">
+    <!-- Moon (shown in dark mode) -->
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+    </svg>
+    <!-- Sun (shown in light mode) -->
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="5"/>
+      <line x1="12" y1="1" x2="12" y2="3"/>
+      <line x1="12" y1="21" x2="12" y2="23"/>
+      <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+      <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+      <line x1="1" y1="12" x2="3" y2="12"/>
+      <line x1="21" y1="12" x2="23" y2="12"/>
+      <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+      <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+    </svg>
+  </button>
+
+</nav>
+
+
+<!-- HERO -->
 <section id="hero" aria-label="Introduction">
   <div class="hero-inner">
-
-    <!-- Giant name — split so second part is italic/dim -->
     <h1 class="hero-name" data-reveal>
       Simone<br />
       <em>Colombo</em>
     </h1>
-
     <div class="hero-bottom">
-      <!-- Left: short statement -->
       <p class="hero-statement" data-reveal data-delay="2">
         <strong>Digital marketer.</strong><br />
         Social media e ads a portata di mano
       </p>
-
-      <!-- Right: two quick facts -->
       <div class="hero-meta" data-reveal data-delay="3">
         <span>Lecco, Italia</span>
       </div>
     </div>
-
   </div>
-
-  <!-- Vertical scroll hint -->
   <div class="hero-scroll" aria-hidden="true">
     <span class="tick"></span>
     Scroll
@@ -729,18 +816,15 @@ footer {
 </section>
 
 
-<!-- ─────────────────────────────────────────
-     MARQUEE between hero and about
-───────────────────────────────────────── -->
+<!-- MARQUEE -->
 <div class="marquee-bar" aria-hidden="true">
   <div class="marquee-track">
-    <!-- Duplicate content for seamless loop -->
     <span>Digital Marketing <em>·</em></span>
     <span>Social media managment <em>·</em></span>
     <span>Meta Ads<em>·</em></span>
     <span>Google Ads<em>·</em></span>
     <span>Performance Marketing <em>·</em></span>
-    <span>Consulenza <em>·</em></span>    
+    <span>Consulenza <em>·</em></span>
     <span>Digital Marketing <em>·</em></span>
     <span>Social media managment <em>·</em></span>
     <span>Meta Ads<em>·</em></span>
@@ -751,20 +835,14 @@ footer {
 </div>
 
 
-<!-- ─────────────────────────────────────────
-     ② ABOUT
-───────────────────────────────────────── -->
+<!-- ABOUT -->
 <section id="about" aria-label="About">
-
   <span class="label" data-reveal>About</span>
-
   <h2 class="about-headline" data-reveal data-delay="1">
     Il digitale non è più una scelta,
     è la tua carta d'identità.<br />
     <em>Affidati a me.</em>
   </h2>
-
-  <!-- Stats row -->
   <div class="about-aside">
     <div class="about-stat" data-reveal data-delay="1">
       <span class="num">6+</span>
@@ -779,62 +857,46 @@ footer {
       <span class="unit">Paesi d'europa</span>
     </div>
   </div>
-
 </section>
 
 
-<!-- ─────────────────────────────────────────
-     ③ EXPERIENCE
-───────────────────────────────────────── -->
+<!-- EXPERIENCE -->
 <section id="experience" aria-label="Experience">
-
   <span class="label" data-reveal>Esperienze</span>
-
   <ul class="exp-list" data-reveal data-delay="1">
-
-    <!-- Each item: index · role · company · year -->
     <li class="exp-row">
       <span class="exp-num">01</span>
       <span class="exp-role">Digital marketer</span>
       <span class="exp-co">Freelance</span>
       <span class="exp-year">2024 — Now</span>
     </li>
-
     <li class="exp-row">
       <span class="exp-num">02</span>
       <span class="exp-role">Ecommerce manager</span>
       <span class="exp-co">Joule</span>
       <span class="exp-year">2021 — 24</span>
     </li>
-
     <li class="exp-row">
       <span class="exp-num">03</span>
       <span class="exp-role">Social media manager</span>
       <span class="exp-co">G.S. Sala al Barro</span>
       <span class="exp-year">2019 — 21</span>
     </li>
-
     <li class="exp-row">
       <span class="exp-num">04</span>
       <span class="exp-role">Contabile</span>
       <span class="exp-co">Gruppo gattinoni</span>
       <span class="exp-year">2015 — 19</span>
     </li>
-
   </ul>
-
 </section>
 
 
-<!-- ─────────────────────────────────────────
-     ④ SKILLS
-     Mix of big serif pills and small sans pills
-───────────────────────────────────────── -->
+<!-- SKILLS / SERVICES -->
 <section id="skills" aria-label="Skills">
 
   <h1 class="about-headline in mb-5">Di cosa mi occupo</h1>
 
-  <!-- Intro più autorevole -->
   <div style="max-width: 720px;" data-reveal data-delay="1">
     <p style="font-size: clamp(1.2rem, 2.5vw, 1.6rem); line-height: 1.5; color: var(--dim); text-align: center;">
       Aiuto aziende e professionisti a <strong style="color: var(--white);">crescere online in modo misurabile</strong>,
@@ -842,11 +904,17 @@ footer {
     </p>
   </div>
 
-  <!-- GRID SERVIZI -->
   <div class="services-grid" data-reveal data-delay="2">
 
-    <!-- 01 -->
+    <!-- 01 Social Media -->
     <div class="service-item">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+      </div>
       <span class="service-index">01</span>
       <h3>Social Media Management</h3>
       <p>
@@ -855,8 +923,15 @@ footer {
       </p>
     </div>
 
-    <!-- 02 -->
+    <!-- 02 Meta Ads -->
     <div class="service-item">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="10"/>
+          <circle cx="12" cy="12" r="6"/>
+          <circle cx="12" cy="12" r="2"/>
+        </svg>
+      </div>
       <span class="service-index">02</span>
       <h3>Meta Ads (Facebook & Instagram)</h3>
       <p>
@@ -865,18 +940,32 @@ footer {
       </p>
     </div>
 
-    <!-- 03 -->
+    <!-- 03 Google Ads -->
     <div class="service-item">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <line x1="11" y1="8" x2="11" y2="14"/>
+          <line x1="8" y1="11" x2="14" y2="11"/>
+        </svg>
+      </div>
       <span class="service-index">03</span>
       <h3>Google Ads</h3>
       <p>
         Intercetto domanda consapevole attraverso campagne su rete di ricerca e display,
-        migliorando visibilità e ritorno sull’investimento.
+        migliorando visibilità e ritorno sull'investimento.
       </p>
     </div>
 
-    <!-- 04 -->
+    <!-- 04 Local Business -->
     <div class="service-item">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
       <span class="service-index">04</span>
       <h3>Strategie per Local Business</h3>
       <p>
@@ -885,8 +974,14 @@ footer {
       </p>
     </div>
 
-    <!-- 05 -->
+    <!-- 05 Strategia Digitale -->
     <div class="service-item">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24">
+          <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+          <polyline points="17 6 23 6 23 12"/>
+        </svg>
+      </div>
       <span class="service-index">05</span>
       <h3>Strategia Digitale</h3>
       <p>
@@ -895,8 +990,14 @@ footer {
       </p>
     </div>
 
-    <!-- 06 -->
+    <!-- 06 Consulenza -->
     <div class="service-item">
+      <div class="service-icon">
+        <svg viewBox="0 0 24 24">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+        </svg>
+      </div>
       <span class="service-index">06</span>
       <h3>Consulenza Web Marketing</h3>
       <p>
@@ -907,7 +1008,6 @@ footer {
 
   </div>
 
-  <!-- MICRO SKILLS (più pulite e meno ridondanti) -->
   <div class="skills-display" style="margin-top: 56px;" data-reveal data-delay="3">
     <span class="skill-pill">Ottimizzazione campagne</span>
     <span class="skill-pill">Gestione budget</span>
@@ -920,43 +1020,29 @@ footer {
 </section>
 
 
-<!-- ─────────────────────────────────────────
-     ⑤ CONTACT
-───────────────────────────────────────── -->
+<!-- CONTACT -->
 <section id="contact" aria-label="Contact">
-
   <span class="label" data-reveal>Lavoriamo insieme</span>
-
-  <!-- Big heading -->
   <h2 class="contact-heading" data-reveal data-delay="1">
     Hai un'idea?<br />
     <em></em>
   </h2>
-
   <div class="contact-row">
-
-    <!-- Email CTA -->
     <a href="mailto:simone.colombo9@gmail.com" class="contact-email" data-reveal data-delay="2">
       simone.colombo9@gmail.com
       <span class="arrow">↗</span>
     </a>
-
-    <!-- Social links stacked -->
     <div class="contact-links" data-reveal data-delay="3">
       <a href="#" target="_blank" rel="noopener">LinkedIn</a>
       <a href="#" target="_blank" rel="noopener">Dribbble</a>
       <a href="#" target="_blank" rel="noopener">GitHub</a>
       <a href="#" target="_blank" rel="noopener">Read.cv</a>
     </div>
-
   </div>
-
 </section>
 
 
-<!-- ─────────────────────────────────────────
-     FOOTER
-───────────────────────────────────────── -->
+<!-- FOOTER -->
 <footer>
   <span>© 2026 Simone Colombo</span>
   <span>Milan, Italy</span>
@@ -964,27 +1050,17 @@ footer {
 </footer>
 
 
-<!-- Bootstrap JS (minimal, for collapse utilities if needed) -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
 /* ═══════════════════════════════════════════════════
    1. CUSTOM CURSOR
-   Tracks mouse position; grows on interactive elements
 ═══════════════════════════════════════════════════ */
 (function() {
   const cursor = document.getElementById('cursor');
   if (!cursor) return;
-
-  let mouseX = 0, mouseY = 0;
-  let curX = 0, curY = 0;
-
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-
-  // Smooth cursor follow via requestAnimationFrame
+  let mouseX = 0, mouseY = 0, curX = 0, curY = 0;
+  document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
   function raf() {
     curX += (mouseX - curX) * 0.15;
     curY += (mouseY - curY) * 0.15;
@@ -993,52 +1069,92 @@ footer {
     requestAnimationFrame(raf);
   }
   raf();
-
-  // Grow on hover for links, buttons, interactive elements
-  document.querySelectorAll('a, button, .exp-row, .skill-pill').forEach(el => {
+  document.querySelectorAll('a, button, .exp-row, .skill-pill, .service-item').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('grow'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('grow'));
   });
 })();
 
 /* ═══════════════════════════════════════════════════
-   2. NAVBAR COMPACT ON SCROLL
+   2. TOP NAV COMPACT ON SCROLL
 ═══════════════════════════════════════════════════ */
 (function() {
-  const nav = document.getElementById('nav');
+  const nav = document.getElementById('top-nav');
   window.addEventListener('scroll', () => {
     nav.classList.toggle('compact', window.scrollY > 60);
   }, { passive: true });
 })();
 
 /* ═══════════════════════════════════════════════════
-   3. REVEAL ON SCROLL
-   IntersectionObserver adds .in class to trigger CSS
+   3. BOTTOM NAV — show after hero, active section tracking
+═══════════════════════════════════════════════════ */
+(function() {
+  const bottomNav = document.getElementById('bottom-nav');
+  const bnavItems = document.querySelectorAll('.bnav-item[data-section]');
+  const sections  = ['hero', 'about', 'experience', 'skills', 'contact'];
+
+  // Show/hide bottom nav based on scroll
+  window.addEventListener('scroll', () => {
+    const heroH = document.getElementById('hero').offsetHeight;
+    if (window.scrollY > heroH * 0.4) {
+      bottomNav.classList.add('visible');
+    } else {
+      bottomNav.classList.remove('visible');
+    }
+  }, { passive: true });
+
+  // Active section via IntersectionObserver
+  const sectionEls = sections.map(id => document.getElementById(id)).filter(Boolean);
+  const sectionObs = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        bnavItems.forEach(item => {
+          item.classList.toggle('active', item.dataset.section === id);
+        });
+      }
+    });
+  }, { threshold: 0.4 });
+  sectionEls.forEach(s => sectionObs.observe(s));
+})();
+
+/* ═══════════════════════════════════════════════════
+   4. THEME TOGGLE — dark / light
+═══════════════════════════════════════════════════ */
+(function() {
+  const btn  = document.getElementById('themeToggle');
+  const body = document.body;
+
+  // Persist preference
+  if (localStorage.getItem('theme') === 'light') body.classList.add('light');
+
+  btn.addEventListener('click', () => {
+    body.classList.toggle('light');
+    localStorage.setItem('theme', body.classList.contains('light') ? 'light' : 'dark');
+  });
+})();
+
+/* ═══════════════════════════════════════════════════
+   5. REVEAL ON SCROLL
 ═══════════════════════════════════════════════════ */
 (function() {
   const targets = document.querySelectorAll('[data-reveal], .line-draw');
-
   const observer = new IntersectionObserver(entries => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
         entry.target.classList.add('in');
-        observer.unobserve(entry.target); // animate once
+        observer.unobserve(entry.target);
       }
     });
-  }, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -80px 0px'
-  });
-
+  }, { threshold: 0.1, rootMargin: '0px 0px -80px 0px' });
   targets.forEach(el => observer.observe(el));
 })();
 
 /* ═══════════════════════════════════════════════════
-   4. SMOOTH SCROLL with nav offset
-   Handles all internal anchor links
+   6. SMOOTH SCROLL
 ═══════════════════════════════════════════════════ */
 (function() {
-  const nav = document.getElementById('nav');
+  const nav = document.getElementById('top-nav');
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', e => {
       const id = link.getAttribute('href');
@@ -1053,22 +1169,18 @@ footer {
 })();
 
 /* ═══════════════════════════════════════════════════
-   5. HERO TEXT PARALLAX (subtle)
-   Moves hero name slightly as user scrolls
+   7. HERO PARALLAX
 ═══════════════════════════════════════════════════ */
 (function() {
   const heroName = document.querySelector('.hero-name');
   if (!heroName) return;
-
   window.addEventListener('scroll', () => {
-    const y = window.scrollY;
-    // Subtle shift — 0.18 factor keeps it gentle
-    heroName.style.transform = `translateY(${y * 0.18}px)`;
+    heroName.style.transform = `translateY(${window.scrollY * 0.18}px)`;
   }, { passive: true });
 })();
 
 /* ═══════════════════════════════════════════════════
-   6. MARQUEE PAUSE ON HOVER
+   8. MARQUEE PAUSE ON HOVER
 ═══════════════════════════════════════════════════ */
 (function() {
   const track = document.querySelector('.marquee-track');
